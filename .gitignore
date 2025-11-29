@@ -16,3 +16,4 @@ __pycache__/
 # Compilados
 *.log
 .DS_Store
+.DS_Store

@@ -1,0 +1,17 @@
+# Entornos virtuales
+venv/
+.venv/
+
+# Archivos de Python
+__pycache__/
+*.pyc
+
+# Credenciales
+.env
+
+# Archivos del IDE
+.vscode/
+.idea/
+
+# Compilados
+*.log

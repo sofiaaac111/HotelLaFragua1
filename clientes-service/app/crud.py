@@ -5,12 +5,24 @@ from . import models, schemas
 def get_cliente(db: Session, cliente_id: int):
     return db.query(models.Cliente).filter(models.Cliente.id == cliente_id).first()
 
-def create_cliente(db: Session, cliente: schemas.ClienteCreate):
-    db_cliente = models.Cliente(**cliente.dict())
-    db.add(db_cliente)
+from app import models
+
+def crear_cliente(db, cliente, user):
+    nuevo = models.Cliente(
+        usuario_id=user["sub"],
+        correo=user["correo"],
+        nombre=cliente.nombre,
+        apellido=cliente.apellido,
+        tipo_documento=cliente.tipo_documento,
+        numero_documento=cliente.numero_documento,
+        telefono=cliente.telefono
+    )
+
+    db.add(nuevo)
     db.commit()
-    db.refresh(db_cliente)
-    return db_cliente
+    db.refresh(nuevo)
+    return nuevo
+
 
 def delete_cliente(db: Session, cliente_id: int):
     cliente = get_cliente(db, cliente_id)

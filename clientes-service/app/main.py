@@ -2,6 +2,7 @@ from fastapi import FastAPI, Depends, HTTPException
 from sqlalchemy.orm import Session
 from .database import SessionLocal, engine
 from . import models, schemas, crud
+from .routers.cliente import router
 
 models.Base.metadata.create_all(bind=engine)  # crea tablas
 
@@ -14,10 +15,6 @@ def get_db():
     finally:
         db.close()
 
-@app.get("/clientes", response_model=list[schemas.Cliente])
-def obtener_clientes(db: Session = Depends(get_db)):
-    return crud.get_clientes(db)
-
 @app.get("/clientes/{cliente_id}", response_model=schemas.Cliente)
 def obtener_cliente(cliente_id: int, db: Session = Depends(get_db)):
     cliente = crud.get_cliente(db, cliente_id)
@@ -25,9 +22,12 @@ def obtener_cliente(cliente_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Cliente no encontrado")
     return cliente
 
-@app.post("/clientes", response_model=schemas.Cliente)
-def crear_cliente(cliente: schemas.ClienteCreate, db: Session = Depends(get_db)):
-    return crud.create_cliente(db, cliente)
+@app.put("/clientes/{cliente_id}", response_model=schemas.Cliente)
+def actualizar_cliente(cliente_id: int, cliente_update: schemas.ClienteUpdate, db: Session = Depends(get_db)):
+    cliente = crud.update_cliente(db, cliente_id, cliente_update)
+    if not cliente:
+        raise HTTPException(status_code=404, detail="Cliente no encontrado")
+    return cliente
 
 @app.delete("/clientes/{cliente_id}")
 def eliminar_cliente(cliente_id: int, db: Session = Depends(get_db)):
@@ -36,9 +36,4 @@ def eliminar_cliente(cliente_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Cliente no encontrado")
     return {"mensaje": "Cliente eliminado con éxito"}
 
-@app.put("/clientes/{cliente_id}", response_model=schemas.Cliente)
-def actualizar_cliente(cliente_id: int, cliente_update: schemas.ClienteUpdate, db: Session = Depends(get_db)):
-    cliente = crud.update_cliente(db, cliente_id, cliente_update)
-    if not cliente:
-        raise HTTPException(status_code=404, detail="Cliente no encontrado")
-    return cliente
+app.include_router(router)

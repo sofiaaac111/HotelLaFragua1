@@ -11,8 +11,12 @@ class ClienteBase(BaseModel):
     correo: Optional[str] = None
     telefono: Optional[str] = None
 
-class ClienteCreate(ClienteBase):
-    pass
+class ClienteCreate(BaseModel):
+    nombre: str
+    apellido: str
+    tipo_documento: str
+    numero_documento: str
+    telefono: str
 
 class Cliente(ClienteBase):
     id: int
